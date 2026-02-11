@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Liliana</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: pink;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2em;
+    margin: 20px;
+}
+
+#buttons {
+    display: inline-flex;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+button {
+    padding: 15px 30px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#noBtn {
+    position: relative;
+}
+
+/* Instagram container (Yes & Fool video) */
+#instagramContainer, #videoContainer {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Scale Instagram embeds to fit screen */
+#instagramContainer blockquote,
+#videoContainer blockquote {
+    width: 80vw !important;       /* 80% of viewport width */
+    max-width: 800px;             /* optional max width */
+    height: auto !important;      /* keep aspect ratio */
+    max-height: 90vh !important;  /* won't overflow viewport height */
+    margin: 0;
+    overflow: hidden;
+}
+
+/* Back button style */
+#backBtn {
+    display: none;
+    margin-top: 10px;
+    padding: 10px 25px;
+    font-size: 18px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1 id="question">I know I can't be your Valentine BUT I can still be in your life right?</h1>
+
+<div id="buttons">
+    <button onclick="yesClick()">Yes</button>
+    <button id="noBtn" onclick="noClick()">No</button>
+</div>
+
+<div id="instagramContainer"></div>
+<div id="videoContainer">
+    <button id="backBtn" onclick="backToGame()">Back</button>
+</div>
+
+<script>
+let noTexts = [
+    "NO!",
+    "Really?",
+    "Come on...",
+    "Don't do this or else...",
+    "Last chance!"
+];
+
+let count = 0;
+let foolMode = false;
+let foolClicks = 0;
+
+// Dynamically load Instagram script
+function loadInstagramScript(callback) {
+    if (window.instgrm) {
+        callback();
+        return;
+    }
+    let script = document.createElement('script');
+    script.src = "https://www.instagram.com/embed.js";
+    script.async = true;
+    script.defer = true;
+    script.onload = callback;
+    document.body.appendChild(script);
+}
+
+function yesClick() {
+    document.getElementById("question").style.display = "none";
+    document.getElementById("buttons").style.display = "none";
+
+    let container = document.getElementById("instagramContainer");
+    container.style.display = "flex";
+
+    container.innerHTML = `
+        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DRAhFb5DvAX/" data-instgrm-version="14" style="background:#FFF; margin:auto; padding:0;">
+        </blockquote>
+        <button id="backBtn" onclick="backToGame()">Back</button>
+    `;
+
+    document.getElementById("backBtn").style.display = "inline-block";
+
+    loadInstagramScript(function() {
+        if (window.instgrm) {
+            window.instgrm.Embeds.process();
+        }
+    });
+}
+
+function noClick() {
+    let noBtn = document.getElementById("noBtn");
+    let question = document.getElementById("question");
+
+    // Move No button around screen
+    let maxX = window.innerWidth - noBtn.offsetWidth - 50;
+    let maxY = window.innerHeight - noBtn.offsetHeight - 50;
+
+    let x = Math.random() * maxX;
+    let y = Math.random() * maxY;
+
+    noBtn.style.position = "fixed";
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+
+    // Changes QUESTION text
+    if (count < noTexts.length) {
+        question.innerText = noTexts[count];
+        count++;
+        return;
+    }
+
+    // Fool mode
+    if (!foolMode) {
+        question.innerText = "You fool!!! Now I am hacking into your account till you say YES HAHAHA!!!";
+        foolMode = true;
+        return;
+    }
+
+    // After fool mode clicks
+    foolClicks++;
+
+    if (foolClicks === 3 ) {
+        // Hide question/buttons
+        document.getElementById("question").style.display = "none";
+        document.getElementById("buttons").style.display = "none";
+
+        let container = document.getElementById("instagramContainer");
+        container.style.display = "flex";
+
+        container.innerHTML = `
+            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DSwxCqIE4t8/" data-instgrm-version="14" style="background:#FFF; margin:auto; padding:0;">
+            </blockquote>
+            <button id="backBtn" onclick="backToGame()">Back</button>
+        `;
+
+        document.getElementById("backBtn").style.display = "inline-block";
+
+        loadInstagramScript(function() {
+            if (window.instgrm) {
+                window.instgrm.Embeds.process();
+            }
+        });
+    }
+}
+
+// Back button function
+function backToGame() {
+    // Hide Instagram container
+    let container = document.getElementById("instagramContainer");
+    container.style.display = "none";
+
+    // Show question/buttons again
+    document.getElementById("question").style.display = "block";
+    document.getElementById("buttons").style.display = "inline-flex";
+
+    // Reset counters
+    count = 0;
+    foolMode = false;
+    foolClicks = 0;
+
+    // Reset No button text and position
+    let noBtn = document.getElementById("noBtn");
+    noBtn.innerText = "No";
+    noBtn.style.position = "relative";
+    noBtn.style.left = "0px";
+    noBtn.style.top = "0px";
+
+    // Reset question text
+    document.getElementById("question").innerText = "I know I can't be your Valentine BUT I can still be in your life right?";
+
+} // Hopefully will impress as this could be a unique experience for her. Happiness will equal profit.
+</script>
+
+</body>
+</html>
